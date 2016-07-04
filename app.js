@@ -1,8 +1,7 @@
-var request = require("request"),
-	express = require("express"),
-	bodyParser = require('body-parser'),
-	app = express(),
-	str="";
+const request = require("request"),
+			express = require("express"),
+			bodyParser = require('body-parser'),
+			app = express();
 
 /*
 *	settings
@@ -10,47 +9,49 @@ var request = require("request"),
 app.use(bodyParser.urlencoded({ extended: false }));
 app.set("views",__dirname+'/views');
 app.set("view engine","ejs");
-app.use(express.static(__dirname+'/public'));
+app.use(express.static(__dirname + '/public'));
 
+/*
+*		router
+*/
 app.get("/",function(req,res) {
-	// var options = {
-	//   url: 'http://dev.unibo.info:9000/elck0003.php',
-	//   method: 'POST',
-	//   headers: headers,
-	//   json: true,
-	//   form: {"q":req.body.name}
-	// }
-	// request(options, function (error, res, body) {
-	// 	str=cut(body);
-	// });
 	res.render("hello");
 });
 app.post("/test",function(req,res) {
 	console.log(req.param("name"));
+
+	var headers = {
+  	'Content-Type':'application/json'
+	}
+
 	var options = {
 	  url: 'http://dev.unibo.info:9000/elck0003.php',
 	  method: 'POST',
 	  headers: headers,
 	  json: true,
-	  form: {"q":req.param("name")}
+	  form: {"q": req.param("name")}
 	}
-	request(options, function (error, hoge, body) {
-		str=cut(body);
-		res.render("test",{hoho:str});
+
+	request(options, function (error, response, body) {
+		res.render("test",{hoho: cut(body)});
 	});
 });
 
-
-var headers = {
-  'Content-Type':'application/json'
-}
-
-
+/*
+*		cut
+*		@params { string } data - response data
+*		@return { string } data - formating data
+*/
 function cut(data){
- data = data.replace(/(<.+>|ユーザー��?.+」|「|��?)/g,"");
-  data = data.match(/[^\x01-\x7E]/g);
-  data = data.join("");
- return data;
+	var min,max;
+	for(max = 0;data[max]!=":"; max++){
+		if(data[max] == ","){
+			min = max;
+		}
+	}
+	data = data.slice(min+1,max);
+	data = data.replace(/\s+/g,"");
+ 	return data;
 }
 
 app.listen(3000,function(){
