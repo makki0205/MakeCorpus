@@ -1,40 +1,45 @@
 const request = require("request"),
 			express = require("express"),
 			bodyParser = require('body-parser'),
-			app = express();
+			app = express(),
+			PORT = 3333;
 
 /*
 *	settings
 */
 app.use(bodyParser.urlencoded({ extended: false }));
 app.set("views",__dirname+'/views');
-app.set("view engine","ejs");
+// app.set("view engine","ejs");
 app.use(express.static(__dirname + '/public'));
 
 /*
 *		router
 */
 app.get("/",function(req,res) {
-	res.render("hello");
+	res.sendfile("index.html");
 });
-app.post("/test",function(req,res) {
-	console.log(req.param("name"));
+app.post("/api",function(req,res) {
 
-	var headers = {
-  	'Content-Type':'application/json'
-	}
+	// var headers = {
+ //  	'Content-Type':'application/json'
+	// }
 
-	var options = {
-	  url: 'http://dev.unibo.info:9000/elck0003.php',
-	  method: 'POST',
-	  headers: headers,
-	  json: true,
-	  form: {"q": req.param("name")}
-	}
+	// var options = {
+	//   url: 'http://dev.unibo.info:9000/elck0003.php',
+	//   method: 'POST',
+	//   headers: headers,
+	//   json: true,
+	//   form: {"q": req.param("name")}
+	// }
 
-	request(options, function (error, response, body) {
-		res.render("test",{hoho: cut(body)});
-	});
+	// request(options, function (error, response, body) {
+	// 	res.json({
+	// 		data: cut(body)
+	// 	})
+	// });
+	res.json({
+		data: Math.floor(Math.random()*100)
+	})
 });
 
 /*
@@ -54,6 +59,6 @@ function cut(data){
  	return data;
 }
 
-app.listen(3000,function(){
+app.listen(PORT,function(){
 	console.log("app starting...");
 });
