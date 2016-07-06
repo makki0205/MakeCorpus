@@ -38,20 +38,20 @@ app.get("/",function(req,res) {
 	res.render("hello",{no:talk});
 });
 app.post("/test:no",function(req,res) {
-	if (req.params.cure != ""){
-		console.log("Cure is ",req.params.cure);
+	if (req.body.cure != ""){
+		console.log("Cure is ",req.body.cure);
 		talks[req.params.no].num--;
-		talks[req.params.no][talks[req.params.no].num]=req.params.cure;
+		talks[req.params.no][talks[req.params.no].num]=req.body.cure;
 		talks[req.params.no].num++;
 	}
-	talks[req.params.no][talks[req.params.no].num]=req.params.name;
+	talks[req.params.no][talks[req.params.no].num]=req.body.name;
 	talks[req.params.no].num++;
 	var options = {
 	  url: 'http://dev.unibo.info:9000/elck0003.php',
 	  method: 'POST',
 	  headers: { 'Content-Type':'application/json' },
 	  json: true,
-	  form: {"q": req.params.name}
+	  form: {"q": req.body.name}
 	}
 
 	request(options, function (error, response, body) {
