@@ -2,7 +2,10 @@ const request = require("request"),
 			express = require("express"),
 			bodyParser = require('body-parser'),
 			app = express(),
+			ECT = require('ect'),
+    	ectRenderer = ECT({ watch: true, root: __dirname + '/views', ext: '.ect' }),
 			fs = require('fs');
+
 var talk = -1;
 var talks = [];
 
@@ -11,56 +14,38 @@ var talks = [];
 */
 app.use(bodyParser.urlencoded({ extended: false }));
 app.set("views",__dirname+'/views');
-app.set("view engine","ejs");
+app.set('view engine', 'ect');
+app.engine('ect', ectRenderer.render);
 app.use(express.static(__dirname + '/public'));
 
 /*
 *		router
 */
-app.get ("/admin",function(req,res) {
-	for (var i = 0; i <= talk; i++) {
-		for (var j = 0; j < talks[i].num; j++) {
-			// console.log("IN");
-			// console.log(talks[i][String(j)]);
-			var s = talks[i][String(j)]+"\n"
-			fs.appendFile('corpus.txt', s,'utf8', function (err) {
-				if(err) throw err;
-			});
-		}
-	}
-	// res.send("ファイルの書き込みが完了しました");
-	res.sendfile(__dirname+"/corpus.txt")
-});
 app.get("/",function(req,res) {
-	talk++;
-	talks[talk]={};
-	talks[talk]["num"]=0;
-	res.render("hello",{no:talk});
+	res.render("index");
 });
-app.post("/test:no",function(req,res) {
-	if (req.body.cure != ""){
-		console.log("Cure is ",req.body.cure);
-		talks[req.params.no].num--;
-		talks[req.params.no][talks[req.params.no].num]=req.body.cure;
-		talks[req.params.no].num++;
-	}
-	talks[req.params.no][talks[req.params.no].num]=req.body.name;
-	talks[req.params.no].num++;
-	var options = {
-	  url: 'http://dev.unibo.info:9000/elck0003.php',
-	  method: 'POST',
-	  headers: { 'Content-Type':'application/json' },
-	  json: true,
-	  form: {"q": req.body.name}
-	}
-
-	request(options, function (error, response, body) {
-		talks[req.params.no][talks[req.params.no].num]=cut(body);
-		res.render("test",{hoho:cut(body),no:req.params.no});
-		talks[req.params.no].num++;
-		console.log("talks is ",talks);
+var cnt = 0;
+app.post("/unib",function(req,res){
+	var input = req.body.input;
+	res.json({
+		text: cnt++
 	});
-	res.redirect("/");
+});
+app.post("/getfile",function(req,res){
+	var arrayStr = req.body.data;
+	arrayStr = arrayStr.split(",");
+	for(var i = 0, len = arrayStr.length; i < len; i++){
+		fs.appendFile('corpus.txt', arrayStr[i]+"\n",'utf8', function (err) {
+			if(err){
+				res.json({
+					message: err
+				});
+			};
+		});
+	}
+	res.json({
+		message: true
+	});
 });
 
 /*
