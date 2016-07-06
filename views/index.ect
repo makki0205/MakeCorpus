@@ -48,6 +48,10 @@
     .bot_card li{
       list-style: none;
     }
+    .item_value{
+      width: 100%;
+      outline: none;
+    }
     .user{
       font-size: 1rem;
       text-align: right;
@@ -77,7 +81,7 @@
 
     <div class="mdl-card mdl-shadow--2dp bot_card">
       <ul id="chat">
-        <li v-for="item in chats" class="chat_item {{ item.type }} data-{{ $index }}"><input type="text" value="{{item.text}}" style="text-align: center;"></li>
+        <li v-for="item in chats" class="chat_item data-{{ $index }}"><input type="text" class="item_value {{ item.type }}" value="{{item.text}}"></li>
       </ul>
     </div>
 

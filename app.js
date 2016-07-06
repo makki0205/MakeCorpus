@@ -24,11 +24,19 @@ app.use(express.static(__dirname + '/public'));
 app.get("/",function(req,res) {
 	res.render("index");
 });
-var cnt = 0;
 app.post("/unib",function(req,res){
 	var input = req.body.input;
-	res.json({
-		text: cnt++
+	var options = {
+	  url: 'http://dev.unibo.info:9000/elck0003.php',
+	  method: 'POST',
+	  headers: { 'Content-Type':'application/json' },
+	  json: true,
+	  form: {"q": input}
+	}
+	request(options, function (error, response, body) {
+		res.json({
+			text: cut(body)
+		});
 	});
 });
 app.post("/getfile",function(req,res){
