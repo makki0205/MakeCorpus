@@ -22,9 +22,9 @@ app.get ("/admin",function(req,res) {
 		for (var j = 0; j < talks[i].num; j++) {
 			// console.log("IN");
 			// console.log(talks[i][String(j)]);
-			var s=talks[i][String(j)]+"\n"
+			var s = talks[i][String(j)]+"\n"
 			fs.appendFile('corpus.txt', s,'utf8', function (err) {
-				if( err ) throw err;
+				if(err) throw err;
 			});
 		}
 	}
@@ -38,31 +38,29 @@ app.get("/",function(req,res) {
 	res.render("hello",{no:talk});
 });
 app.post("/test:no",function(req,res) {
-
-	if (req.param.cure !=""){
-		console.log("IN"+req.param.cure);
+	if (req.params.cure != ""){
+		console.log("Cure is ",req.params.cure);
 		talks[req.params.no].num--;
-		talks[req.params.no][talks[req.params.no].num]=req.param.cure;
+		talks[req.params.no][talks[req.params.no].num]=req.params.cure;
 		talks[req.params.no].num++;
 	}
-	talks[req.params.no][talks[req.params.no].num]=req.param.name;
+	talks[req.params.no][talks[req.params.no].num]=req.params.name;
 	talks[req.params.no].num++;
 	var options = {
 	  url: 'http://dev.unibo.info:9000/elck0003.php',
 	  method: 'POST',
 	  headers: { 'Content-Type':'application/json' },
 	  json: true,
-	  form: {"q": req.param.name}
+	  form: {"q": req.params.name}
 	}
 
 	request(options, function (error, response, body) {
 		talks[req.params.no][talks[req.params.no].num]=cut(body);
 		res.render("test",{hoho:cut(body),no:req.params.no});
 		talks[req.params.no].num++;
-		console.log(talks);
+		console.log("talks is ",talks);
 	});
 	res.redirect("/");
-	res.end();
 });
 
 /*
