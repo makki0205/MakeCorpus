@@ -3,6 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<title>MakeCorpus</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,user-scalable=no">
 
 	<link rel="stylesheet" href="/stylesheets/sanitize.min.css">
 	<link rel="stylesheet" href="/stylesheets/material.min.css">
@@ -59,6 +60,44 @@
     .bot{
       font-size: 1rem;
       text-align: left;
+    }
+    @media only screen and (max-width: 970px){
+      .mdl-layout-title{
+        width: 100%;
+        text-align: center;
+      }
+      .mdl-layout__header-row{
+        padding: 0;
+      }
+      .bot_card li{
+        margin: 10px 0;
+      }
+      .card,
+      .bot_card {
+        width: 90%;
+        display: block;
+        margin: 5% auto;
+        min-height: 0;
+        padding: 3%;
+      }
+      button{
+        width: 45%;
+      }
+      .bot_card{
+        height: 55vh;
+      }
+      .item_value{
+        width: 100%;
+        outline: none;
+      }
+      .user{
+        font-size: 1rem;
+        text-align: right;
+      }
+      .bot{
+        font-size: 1rem;
+        text-align: left;
+      }
     }
   </style>
 </head>
