@@ -70,4 +70,4 @@ jspm_packages
 .node_repl_history
 
 # corpus.txt
-./corpus.txt
+corpus.txt
