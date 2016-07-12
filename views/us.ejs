@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<title>MakeCorpus</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,user-scalable=no">
+
+	<link rel="stylesheet" href="/stylesheets/sanitize.min.css">
+	<link rel="stylesheet" href="/stylesheets/material.min.css">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+  <style rel="stylesheet">
+    body,html{
+      text-align: center;
+      background-color: #424242;
+    }
+    *{
+      box-sizing: border-box;
+    }
+    .mdl-layout__header{
+      background-color: #212121;
+    }
+    .card,
+    .bot_card {
+      width: 40%;
+      display: inline-block;
+      margin: 5% 3%;
+      background-color: white;
+      min-height: 0;
+      padding: 3%;
+    }
+    .mdl-js-textfield{
+      width: 80%;
+      margin: 0 auto;
+    }
+    button{
+      display: inline-block;
+      width: 30%;
+    }
+    .bot_card{
+      height: 25rem;
+      padding: 10px 30px;
+    }
+    .bot_card ul{
+      width: 100%;
+      height: 100%;
+      overflow: scroll;
+    }
+    .bot_card li{
+      list-style: none;
+    }
+    .item_value{
+      width: 100%;
+      outline: none;
+    }
+    .user{
+      font-size: 1rem;
+      text-align: right;
+    }
+    .bot{
+      font-size: 1rem;
+      text-align: left;
+    }
+    @media only screen and (max-width: 970px){
+      .mdl-layout-title{
+        width: 100%;
+        text-align: center;
+      }
+      .mdl-layout__header-row{
+        padding: 0;
+      }
+      .bot_card li{
+        margin: 10px 0;
+      }
+      .card,
+      .bot_card {
+        width: 90%;
+        display: block;
+        margin: 5% auto;
+        min-height: 0;
+        padding: 3%;
+      }
+      button{
+        width: 45%;
+      }
+      .bot_card{
+        height: 55vh;
+      }
+      .item_value{
+        width: 100%;
+        outline: none;
+      }
+      .user{
+        font-size: 1rem;
+        text-align: right;
+      }
+      .bot{
+        font-size: 1rem;
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+
+	<!-- header -->
+  <header class="mdl-layout__header">
+    <div class="mdl-layout__header-row">
+
+      <span class="mdl-layout-title">Make Corpus</span>
+
+    </div>
+  </header>
+
+  <!-- main -->
+  <main class="mdl-layout__content">
+    <div class="page-content">
+
+    <div class="mdl-card mdl-shadow--2dp bot_card">
+      <ul id="chat">
+        <li v-for="item in chats" class="chat_item data-{{ $index }}"><input type="text" class="item_value {{ item.type }}" value="{{item.text}}"></li>
+      </ul>
+    </div>
+
+    <div class="mdl-card mdl-shadow--2dp card">
+      <div class="mdl-textfield mdl-js-textfield">
+        <input class="mdl-textfield__input" type="text" id="userinput" />
+        <label class="mdl-textfield__label" for="userinput">User input...</label>
+      </div>
+
+      <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--primary send">
+        POST
+      </button>
+      <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--primary getfile">
+        Export
+      </button>
+    </div>
+
+    </div>
+  </main>
+</div>
+
+  <script src="/javascripts/jquery.min.js"></script>
+	<script src="/javascripts/vue.min.js"></script>
+	<script src="/javascripts/material.min.js"></script>
+  <script type="text/javascript">
+    (function($){
+      /*
+      *   vue
+      */
+      var vm = new Vue({
+        el: "#chat",
+        data: {
+          chats: []
+        }
+      });
+
+      $(".send").on("click",function(){
+        var $input = $("#userinput").val();
+        if($input == "") return;
+        $("#userinput").val("");
+        vm.chats.unshift({
+          text: $input,
+          type: "user"
+        });
+        $.ajax({
+          url: "/us/unib",
+          type: "post",
+          data: {
+            input: $input
+          },
+          success: function(data){
+            vm.chats.unshift({
+              text: data.text,
+              type: "bot"
+            });
+          }
+        })
+        $("#userinput").focus();
+      });
+
+      /*
+      *   chat をファイルに書き出す
+      */
+      $(".getfile").on("click",function(){
+        if(confirm("本当に書き出しますか！")){
+          var data = [];
+          var max_count = vm.chats.length;
+
+          for(var i = 0; i < max_count; i++){
+            data.push($(".data-"+i+" input").val());
+          }
+          data = data.reverse();
+          data = data.join(",");
+          $.ajax({
+            url: "/us/getfile",
+            type: "POST",
+            data: {
+              data: data
+            },
+            success: function(res){
+              if(res.message){
+                $("#userinput").val("");
+                alert("corpus.txtで書き出しました！");
+                vm.chats = [];
+              }
+            }
+          });
+        }
+      });
+
+      $(window).keydown(function(e){
+        if(event.shiftKey){
+          if(e.keyCode === 13){
+            e.preventDefault();
+            $(".getfile").click();
+          }
+        }
+      });
+    })(jQuery);
+  </script>
+</body>
+</html>

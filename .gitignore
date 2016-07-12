@@ -71,5 +71,6 @@ jspm_packages
 
 # corpus.txt
 corpus.txt
+uscorpus.txt
 
 # ./node_modules
