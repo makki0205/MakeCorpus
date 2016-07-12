@@ -42,7 +42,6 @@ router.post("/unib",function(req,res){
 	var headers = {
 		'Content-Type':'application/json'
 	}
-	// var formText ='{"words":"'+input+'", "language":"JP"}'
 	var options = {
 		  url: 'http://dev.unibo.info:7071/api/language/chat',
 		  method: 'POST',

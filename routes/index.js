@@ -22,7 +22,7 @@ router.post("/getfile",function(req,res){
 	var arrayStr = req.body.data;
 	arrayStr = arrayStr.split(",");
 	for(var i = 0, len = arrayStr.length; i < len; i++){
-		fs.appendFile('corpus.txt', arrayStr[i]+"\n",'utf8', function (err) {
+		fs.appendFile('routes/corpuses/corpus.txt', arrayStr[i]+"\n",'utf8', function (err) {
 			if(err){
 				res.json({
 					message: err
@@ -42,7 +42,6 @@ router.post("/unib",function(req,res){
 	var headers = {
 		'Content-Type':'application/json'
 	}
-	// var formText ='{"words":"'+input+'", "language":"JP"}'
 	var options = {
 		  url: 'http://dev.unibo.info:7070/api/language/chat',
 		  method: 'POST',
