@@ -1,86 +1,62 @@
-const request = require("request"),
-			express = require("express"),
-			bodyParser = require('body-parser'),
-			app = express(),
-			ECT = require('ect'),
-    	ectRenderer = ECT({ watch: true, root: __dirname + '/views', ext: '.ect' }),
-			fs = require('fs');
+var express = require('express');
+var path = require('path');
+var favicon = require('serve-favicon');
+var logger = require('morgan');
+var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser');
 
-var talk = -1;
-var talks = [];
+var routes = require('./routes/index');
+var users = require('./routes/users');
 
-/*
-*	settings
-*/
-app.use(bodyParser.urlencoded({ extended: false }));
-app.set("views",__dirname+'/views');
-app.set('view engine', 'ect');
-app.engine('ect', ectRenderer.render);
-app.use(express.static(__dirname + '/public'));
+var app = express();
 
-/*
-*		router
-*/
-app.get("/corpus.txt",function(req,res){
-	res.sendfile(__dirname+"/corpus.txt")
-});
-app.get("/",function(req,res) {
-	res.render("index");
-});
-var cnt = 0;
-app.post("/unib",function(req,res){
-	var input = req.body.input;
-	var headers = {
-		'Content-Type':'application/json'
-	}
-	var options = {
-		  url: 'http://dev.unibo.info:9000/elck0003.php',
-		  method: 'POST',
-		  headers: headers,
-		  json: true,
-		  form: {"q": input}
-		}
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
 
-		request(options, function (error, response, body) {
-			res.json({
-				text: cut(body)
-			});
-		});
-});
-app.post("/getfile",function(req,res){
-	var arrayStr = req.body.data;
-	arrayStr = arrayStr.split(",");
-	for(var i = 0, len = arrayStr.length; i < len; i++){
-		fs.appendFile('corpus.txt', arrayStr[i]+"\n",'utf8', function (err) {
-			if(err){
-				res.json({
-					message: err
-				});
-			};
-		});
-	}
-	res.json({
-		message: true
-	});
+// uncomment after placing your favicon in /public
+//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+app.use(logger('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+    extended: false
+}));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.use('/', routes);
+app.use('/users', users);
+
+// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+    var err = new Error('Not Found');
+    err.status = 404;
+    next(err);
 });
 
-/*
-*		cut
-*		@params { string } data - response data
-*		@return { string } data - formating data
-*/
-function cut(data){
-	var min,max;
-	for(max = 0;data[max]!=":"; max++){
-		if(data[max] == ","){
-			min = max;
-		}
-	}
-	data = data.slice(min+1,max);
-	data = data.replace(/\s+/g,"");
- 	return data;
+// error handlers
+
+// development error handler
+// will print stacktrace
+if (app.get('env') === 'development') {
+    app.use(function(err, req, res, next) {
+        res.status(err.status || 500);
+        res.render('error', {
+            message: err.message,
+            error: err
+        });
+    });
 }
 
-app.listen(3000,function(){
-	console.log("app starting...");
+// production error handler
+// no stacktraces leaked to user
+app.use(function(err, req, res, next) {
+    res.status(err.status || 500);
+    res.render('error', {
+        message: err.message,
+        error: {}
+    });
 });
+
+
+module.exports = app;
