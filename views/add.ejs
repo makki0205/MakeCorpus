@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>User add</title>
+</head>
+<body>
+
+	<p class="result"></p>
+
+	<label>ID<input type="text" class="name"></label>
+	<label>Password<input type="password" class="password"></label>
+	<button class="register">登録</button>
+
+	<p><a href="/">ユーザー一覧を見る</a></p>
+
+<script src="/javascripts/jquery.min.js"></script>
+<script type="text/javascript">
+	var postForm = function(url, data) {
+		var $form = $('<form/>', {'action': url, 'method': 'post'});
+		for(var key in data) {
+				$form.append($('<input/>', {'type': 'hidden', 'name': key, 'value': data[key]}));
+		}
+		$form.appendTo(document.body);
+		$form.submit();
+	};
+	(function($){
+		$(".register").on("click",function(){ //.registerをクリックしたら
+
+			var name = $(".name").val(); // nameの値を取得
+			var password = $(".password").val(); // passwordの値を取得
+
+
+			$(".name").val(""); // 綺麗にする
+			$(".password").val("");
+
+			if(name == "" || password == ""){ //未入力チェック
+				$(".result").text("未入力があります。");
+				return;
+			}
+			$.ajax({
+				url: "/users/<%= status%>",
+				type: "POST",
+				data: {
+					name: name,
+					password: password
+				},
+				success: function(data){
+					if (data.message) {
+						$(".result").text(data.message); //dataをresultへ
+					}else{
+						console.log(userdata);
+						var userdata={name:name,password:password};
+						postForm("/",userdata);
+					}
+				}
+			});
+		});
+	})(jQuery);
+</script>
+</body>
+</html>

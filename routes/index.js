@@ -3,7 +3,9 @@ var router = express.Router();
 // ローカル require
 var request = require("request");
 var fs = require("fs");
-
+var	mongoose 	= require('mongoose');
+var usersDB 	= require('../models/usersManagemen.js');
+mongoose.connect('mongodb://localhost/hogehoge');
 
 /*
 * get corpus.txt
@@ -13,8 +15,20 @@ router.get("/corpus.txt",function(req,res){
 });
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index');
+  res.render('login');
 });
+router.post('/',function(req,res){
+	var name = req.body.name;
+	var password = req.body.password;
+	usersDB.findOne({name: name,password: password},function(err,user){
+		if (err) res.json({ message: err });
+		else if(user){
+			res.render("index",{name:name,password:password});
+		}else{
+			res.json({ message: "ログインできませんでした。" });
+		}
+	});
+})
 /*
 * 書き出し
 */
